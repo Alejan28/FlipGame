@@ -23,8 +23,8 @@ The game follows a centralized server architecture to ensure data integrity and 
 ## 🛠 Tech Stack
 - **Language**: Java
 - **Networking**: Java Sockets (TCP/IP)
-- **Patterns**: Proxy, Observer, Singleton (optional, for Server management)
-- **Concurrency**: Multi-threading (to handle multiple simultaneous clients)
+- **Patterns**: Proxy, Observer
+- **Concurrency**: Multi-threading 
 
 ## 📋 Features
 - **Centralized Game State**: Matching logic is validated server-side to prevent cheating.
