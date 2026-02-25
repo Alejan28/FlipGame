@@ -1,8 +1,7 @@
 package Utils;
 
-import Domain.Game;
-import Domain.Move;
-import Domain.Player;
+import Domain.*;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -23,6 +22,10 @@ public class HibernateUtils {
                 .addAnnotatedClass(Domain.Configuration.class)
                 .addAnnotatedClass(Game.class)
                 .addAnnotatedClass(Move.class)
+                .addAnnotatedClass(Word.class)
+                .addAnnotatedClass(WordGame.class)
+                .addAnnotatedClass(WordGameConfig.class)
+                .addAnnotatedClass(Choice.class)
                 .buildSessionFactory();
         return sessionFactory;
     }

@@ -1,13 +1,7 @@
 package Server;
 
-import Domain.Configuration;
-import Domain.Game;
-import Domain.Move;
-import Domain.Player;
-import clientServer.Repository.Interfaces.ConfigurationRepoInterface;
-import clientServer.Repository.Interfaces.GameRepoInterface;
-import clientServer.Repository.Interfaces.MoveRepoInterface;
-import clientServer.Repository.Interfaces.PlayerRepoInterface;
+import Domain.*;
+import clientServer.Repository.Interfaces.*;
 import Services.GameException;
 import Services.IObserver;
 import Services.IServices;
@@ -27,14 +21,31 @@ public class ServicesImplementation implements IServices {
     private GameRepoInterface gameRepo;
     private ConfigurationRepoInterface configurationRepo;
     private MoveRepoInterface moveRepo;
+    private WordRepoInterface wordRepo;
+    private WordGameConfigRepoInterface wordGameConfigRepo;
+    private WordGameRepoInterface wordGameRepo;
+    private ChoiceRepoInterface choiceRepo;
     private Map<String, IObserver> loggedPlayers;
     private static Logger logger = LogManager.getLogger(ServicesImplementation.class);
-    public ServicesImplementation(PlayerRepoInterface playerRepo,GameRepoInterface gameRepo,ConfigurationRepoInterface configurationRepo,MoveRepoInterface moveRepo) {
+    public ServicesImplementation(PlayerRepoInterface playerRepo,GameRepoInterface gameRepo,ConfigurationRepoInterface configurationRepo,MoveRepoInterface moveRepo,WordRepoInterface wordRepo,WordGameConfigRepoInterface wordGameConfigRepo,WordGameRepoInterface wordGameRepo,ChoiceRepoInterface choiceRepo) {
         this.playerRepo = playerRepo;
         this.gameRepo = gameRepo;
         this.configurationRepo = configurationRepo;
         this.moveRepo = moveRepo;
+        this.wordRepo = wordRepo;
+        this.wordGameConfigRepo = wordGameConfigRepo;
+        this.wordGameRepo = wordGameRepo;
+        this.choiceRepo = choiceRepo;
         loggedPlayers=new ConcurrentHashMap<>();
+    }
+    public void setWordRepo(WordRepoInterface wordRepo) {
+        this.wordRepo = wordRepo;
+    }
+    public void setWordGameConfigRepo(WordGameConfigRepoInterface wordGameConfigRepo) {
+        this.wordGameConfigRepo = wordGameConfigRepo;
+    }
+    public void setWordGameRepo(WordGameRepoInterface wordGameRepo) {
+        this.wordGameRepo = wordGameRepo;
     }
     @Override
     public synchronized void login(Player player, IObserver observer) throws GameException {
@@ -87,6 +98,50 @@ public class ServicesImplementation implements IServices {
     public synchronized List<Game> getRanking() throws GameException {
         Iterable<Game> games= gameRepo.findAll();
         List<Game> ranking=new ArrayList<>();
+        ranking= StreamSupport.stream(games.spliterator(),false).toList();
+        return ranking;
+    }
+    private synchronized List<Word> getWords(){
+        return wordRepo.generateRandomWord(6);
+    }
+    private synchronized WordGameConfig getWordGameConfig(){
+        WordGameConfig wgc= new WordGameConfig();
+        wgc.setWords(getWords());
+        return wgc;
+    }
+
+    @Override
+    public synchronized WordGame startWordGame(Player player) throws GameException {
+        WordGameConfig wgc= getWordGameConfig();
+        WordGame wg= new WordGame();
+        Player playerR=playerRepo.findByNickname(player.getNickname());
+        wg.setPlayer(playerR);
+        wg.setConfig(wgc);
+        wg.setStatus(Game.gameStatus.STARTED);
+        wg.setStartTime(LocalDateTime.now());
+        wg.setDuration(Duration.ZERO);
+        wg.setTurns(0);
+        WordGame finalwg=wordGameRepo.createNewGame(wg);
+        return finalwg;
+    }
+
+    @Override
+    public synchronized void addChoice(Choice choice) throws GameException {
+        choiceRepo.add(choice);
+    }
+
+    @Override
+    public synchronized void updateWordGame(WordGame wordGame) throws GameException {
+        for(IObserver observer:loggedPlayers.values()){
+                observer.wordGame(wordGame);
+        }
+        wordGameRepo.update(wordGame.getId(),wordGame);
+    }
+
+    @Override
+    public synchronized List<WordGame> getRankingWordGame() throws GameException {
+        Iterable<WordGame> games= wordGameRepo.findAll();
+        List<WordGame> ranking=new ArrayList<>();
         ranking= StreamSupport.stream(games.spliterator(),false).toList();
         return ranking;
     }

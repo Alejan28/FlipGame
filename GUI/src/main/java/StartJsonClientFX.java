@@ -1,6 +1,7 @@
 
 import Services.IServices;
 import gui.GameController;
+import gui.GridPaneController;
 import gui.LogInController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -59,13 +60,13 @@ public class StartJsonClientFX extends Application {
         ctrl.setServices(server);
 
         FXMLLoader cloader = new FXMLLoader(
-                getClass().getClassLoader().getResource("game-view.fxml"));
+                getClass().getClassLoader().getResource("grid-view.fxml"));
         Parent croot=cloader.load();
 
 
-        GameController gameCtrl =
-                cloader.<GameController>getController();
-        ctrl.setGameController(gameCtrl);
+        GridPaneController gameCtrl =
+                cloader.<GridPaneController>getController();
+        ctrl.setGridPaneController(gameCtrl);
         ctrl.setParent(croot);
         primaryStage.setTitle("Joc Animale");
         primaryStage.setScene(new Scene(root));

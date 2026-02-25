@@ -2,6 +2,7 @@ package jsonprotocol;
 
 
 import dtos.GameDTO;
+import dtos.WordGameDTO;
 
 import java.io.Serializable;
 
@@ -10,6 +11,8 @@ public class Response implements Serializable {
     private String errorMessage;
     private GameDTO game;
     private GameDTO[] games;
+    private WordGameDTO[] wordGames;
+    private WordGameDTO wordGame;
     public Response(){
 
     }
@@ -37,6 +40,20 @@ public class Response implements Serializable {
     public GameDTO[] getGames(){
         return games;
     }
+    public void setWordGame(WordGameDTO wordGame){
+        this.wordGame = wordGame;
+    }
+    public WordGameDTO getWordGame(){
+        return wordGame;
+    }
+    public void setWordGames(WordGameDTO[] wordGames){
+        this.wordGames = wordGames;
+    }
+    public WordGameDTO[] getWordGames(){
+        return wordGames;
+    }
+
+
     @Override
     public String toString() {
         return "Response{" +

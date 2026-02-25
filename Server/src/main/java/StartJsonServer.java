@@ -1,12 +1,6 @@
 import Domain.Configuration;
-import clientServer.Repository.HibernateRepos.ConfigurationHibernateRepository;
-import clientServer.Repository.HibernateRepos.GameHibernateRepository;
-import clientServer.Repository.HibernateRepos.MoveHibernateRepository;
-import clientServer.Repository.HibernateRepos.PlayerHibernateRepository;
-import clientServer.Repository.Interfaces.ConfigurationRepoInterface;
-import clientServer.Repository.Interfaces.GameRepoInterface;
-import clientServer.Repository.Interfaces.MoveRepoInterface;
-import clientServer.Repository.Interfaces.PlayerRepoInterface;
+import clientServer.Repository.HibernateRepos.*;
+import clientServer.Repository.Interfaces.*;
 import Server.ServicesImplementation;
 import Services.IServices;
 import org.apache.logging.log4j.LogManager;
@@ -37,13 +31,18 @@ public class StartJsonServer {
         ConfigurationRepoInterface configurationRepo=new ConfigurationHibernateRepository();
         GameRepoInterface gameRepo=new GameHibernateRepository();
         MoveRepoInterface moveRepo=new MoveHibernateRepository();
+        WordGameRepoInterface wordGameRepo=new WordGameHibernateRepository();
+        WordGameConfigRepoInterface wordGameConfigRepo=new WordGameConfigHibernateRepository();
+        WordRepoInterface wordRepo=new WordHibernateRepository();
+        ChoiceRepoInterface choiceRepo=new ChoiceHibernateRepository();
         Configuration newConfiguration=new Configuration();
         newConfiguration.setAnimal("Elefant");
         newConfiguration.setColumn(2);
         newConfiguration.setRow(1);
         newConfiguration.setImage("imagine");
         //configurationRepo.add(newConfiguration);
-        IServices gameServer=new ServicesImplementation(playerRepo,gameRepo,configurationRepo,moveRepo);
+        IServices gameServer=new ServicesImplementation(playerRepo,gameRepo,configurationRepo,moveRepo,wordRepo,wordGameConfigRepo,wordGameRepo,choiceRepo);
+
         Properties props= serverProps;
         int McServerPort=defaultPort;
         try {

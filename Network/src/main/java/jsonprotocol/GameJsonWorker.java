@@ -1,16 +1,11 @@
 package jsonprotocol;
 
-import Domain.Game;
-import Domain.Move;
-import Domain.Player;
+import Domain.*;
 import Services.GameException;
 import Services.IObserver;
 import Services.IServices;
 import com.google.gson.Gson;
-import dtos.DTOUtils;
-import dtos.GameDTO;
-import dtos.MoveDTO;
-import dtos.PlayerDTO;
+import dtos.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.TextUtils;
@@ -104,12 +99,36 @@ public class GameJsonWorker implements Runnable, IObserver {
                 return JsonprotocolUtils.createErrorResponse(e.getMessage());
             }
         }
+        if (request.getType()== RequestType.START_WORD_GAME){
+            logger.debug("Start game request by  ...{}"+request.getPlayer());
+            PlayerDTO pdto=request.getPlayer();
+            Player player= DTOUtils.getPlayerDTO(pdto);
+            try {
+                WordGame game=server.startWordGame(player);
+                return JsonprotocolUtils.createWordGameStartedResponse(game);
+            } catch (GameException e) {
+                connected=false;
+                return JsonprotocolUtils.createErrorResponse(e.getMessage());
+            }
+        }
         if (request.getType()== RequestType.MAKE_MOVE){
             logger.debug("make a move  ...{}"+request.getMove());
             MoveDTO mdto=request.getMove();
             Move move=DTOUtils.getFromDTO(mdto);
             try {
                 server.makeMove(move);
+                return okResponse;
+            } catch (GameException e) {
+                connected=false;
+                return JsonprotocolUtils.createErrorResponse(e.getMessage());
+            }
+        }
+        if (request.getType()== RequestType.SEND_CHOICE){
+            logger.debug("make a choice  ...{}"+request.getChoice());
+            ChoiceDTO choiceDTO=request.getChoice();
+            Choice choice= DTOUtils.getFromDTO(choiceDTO);
+            try {
+                server.addChoice(choice);
                 return okResponse;
             } catch (GameException e) {
                 connected=false;
@@ -128,11 +147,33 @@ public class GameJsonWorker implements Runnable, IObserver {
                 return JsonprotocolUtils.createErrorResponse(e.getMessage());
             }
         }
+        if (request.getType()== RequestType.UPDATE_WORD_GAME){
+            logger.debug("update a agme  ...{}"+request.getWordGame());
+            WordGameDTO wdto=request.getWordGame();
+            WordGame game=DTOUtils.getFromDTO(wdto);
+            try {
+                server.updateWordGame(game);
+                return okResponse;
+            } catch (GameException e) {
+                connected=false;
+                return JsonprotocolUtils.createErrorResponse(e.getMessage());
+            }
+        }
         if (request.getType()== RequestType.GET_RANKING){
             logger.debug("get ranking");
             try {
                 List<Game> games=server.getRanking();
                 return JsonprotocolUtils.createRankingResponse(games);
+            } catch (GameException e) {
+                connected=false;
+                return JsonprotocolUtils.createErrorResponse(e.getMessage());
+            }
+        }
+        if (request.getType()== RequestType.GET_RANKING_WG){
+            logger.debug("get ranking");
+            try {
+                List<WordGame> games=server.getRankingWordGame();
+                return JsonprotocolUtils.createWordGameRanking(games);
             } catch (GameException e) {
                 connected=false;
                 return JsonprotocolUtils.createErrorResponse(e.getMessage());
@@ -154,6 +195,17 @@ public class GameJsonWorker implements Runnable, IObserver {
     public void gameWon(Game game) throws GameException {
         Response resp= JsonprotocolUtils.createGameWon(game);
         logger.debug("Game won "+game.getPlayer().getNickname());
+        try {
+            sendResponse(resp);
+        } catch (IOException e) {
+            throw new GameException("Adding error: "+e);
+        }
+    }
+
+    @Override
+    public void wordGame(WordGame wordGame) throws GameException {
+        Response resp= JsonprotocolUtils.createWordGameWon(wordGame);
+        logger.debug("Game won "+wordGame.getPlayer().getNickname());
         try {
             sendResponse(resp);
         } catch (IOException e) {

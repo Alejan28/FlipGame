@@ -1,0 +1,9 @@
+rootProject.name = 'animale_11.06.2025'
+include 'Model'
+include 'Persistence'
+include 'Server'
+include 'Services'
+include 'Network'
+include 'GUI'
+include 'Rest-Services'
+

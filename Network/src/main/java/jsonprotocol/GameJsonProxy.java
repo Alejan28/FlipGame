@@ -1,8 +1,6 @@
 package jsonprotocol;
 
-import Domain.Game;
-import Domain.Move;
-import Domain.Player;
+import Domain.*;
 import Services.GameException;
 import Services.IObserver;
 import Services.IServices;
@@ -113,10 +111,20 @@ public class GameJsonProxy implements IServices {
                 logger.error(e.getStackTrace());
             }
         }
+        if (response.getType()== ResponseType.WORD_GAME_FINISHED){
+            WordGame game=DTOUtils.getFromDTO(response.getWordGame());
+            logger.debug("Game Won");
+            try{
+               client.wordGame(game);
+            }catch(GameException e){
+                logger.error(e);
+                logger.error(e.getStackTrace());
+            }
+        }
     }
 
     private boolean isUpdate(Response response){
-       return response.getType()==ResponseType.GAME_WON;
+       return response.getType()==ResponseType.WORD_GAME_FINISHED;
     }
 
     @Override
@@ -190,6 +198,62 @@ public class GameJsonProxy implements IServices {
             throw new GameException(err);
         }
         return DTOUtils.getGamesFromDTO(response.getGames());
+    }
+
+    @Override
+    public WordGame startWordGame(Player player) throws GameException {
+        Request req= JsonprotocolUtils.createStartWordGameRequest(player);
+        sendRequest(req);
+        Response response=readResponse();
+        if (response.getType()== ResponseType.ERROR){
+            String err=response.getErrorMessage();;
+            closeConnection();
+            throw new GameException(err);
+        }
+        return DTOUtils.getFromDTO(response.getWordGame());
+    }
+
+    @Override
+    public void addChoice(Choice choice) throws GameException {
+        Request req= JsonprotocolUtils.createMakeChoiceDTO(choice);
+        sendRequest(req);
+        Response response=readResponse();
+        if (response.getType()== ResponseType.OK){
+            return;
+        }
+        if (response.getType()== ResponseType.ERROR){
+            String err=response.getErrorMessage();;
+            closeConnection();
+            throw new GameException(err);
+        }
+    }
+
+    @Override
+    public void updateWordGame(WordGame wordGame) throws GameException {
+        Request req= JsonprotocolUtils.createUpdateWordGameRequest(wordGame);
+        sendRequest(req);
+        Response response=readResponse();
+        if (response.getType()== ResponseType.OK){
+            return;
+        }
+        if (response.getType()== ResponseType.ERROR){
+            String err=response.getErrorMessage();;
+            closeConnection();
+            throw new GameException(err);
+        }
+    }
+
+    @Override
+    public List<WordGame> getRankingWordGame() throws GameException {
+        Request req= JsonprotocolUtils.getWordGameRanking();
+        sendRequest(req);
+        Response response=readResponse();
+        if (response.getType()== ResponseType.ERROR){
+            String err=response.getErrorMessage();;
+            closeConnection();
+            throw new GameException(err);
+        }
+        return DTOUtils.getFromDTO(response.getWordGames());
     }
 
     private class ReaderThread implements Runnable{

@@ -1,8 +1,6 @@
 package jsonprotocol;
 
-import Domain.Game;
-import Domain.Move;
-import Domain.Player;
+import Domain.*;
 import dtos.DTOUtils;
 
 import java.util.List;
@@ -66,4 +64,46 @@ public class JsonprotocolUtils {
         resp.setGame(DTOUtils.getDTO(game));
         return resp;
     }
+    public static Response createWordGameWon(WordGame wordGame){
+        Response resp=new Response();
+        resp.setType(ResponseType.WORD_GAME_FINISHED);
+        resp.setWordGame(DTOUtils.getDTO(wordGame));
+        return resp;
+    }
+    public static Request createStartWordGameRequest(Player game){
+        Request req=new Request();
+        req.setType(RequestType.START_WORD_GAME);
+        req.setPlayer(DTOUtils.getDTO(game));
+        return req;
+    }
+    public static Response createWordGameStartedResponse(WordGame game){
+        Response resp=new Response();
+        resp.setType(ResponseType.WORD_GAME_STARTED);
+        resp.setWordGame(DTOUtils.getDTO(game));
+        return resp;
+    }
+    public static Request createMakeChoiceDTO(Choice choice){
+        Request req=new Request();
+        req.setType(RequestType.SEND_CHOICE);
+        req.setChoice(DTOUtils.getDTO(choice));
+        return req;
+    }
+    public static Request createUpdateWordGameRequest(WordGame game){
+        Request req=new Request();
+        req.setType(RequestType.UPDATE_WORD_GAME);
+        req.setWordGame(DTOUtils.getDTO(game));
+        return req;
+    }
+    public static Request getWordGameRanking(){
+        Request req=new Request();
+        req.setType(RequestType.GET_RANKING_WG);
+        return req;
+    }
+    public static Response createWordGameRanking(List<WordGame> games){
+        Response resp=new Response();
+        resp.setType(ResponseType.RETURN_RANKING);
+        resp.setWordGames(DTOUtils.getWordGameDTO(games));
+        return resp;
+    }
+
 }

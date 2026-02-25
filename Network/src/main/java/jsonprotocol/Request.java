@@ -7,6 +7,8 @@ public class Request {
     private PlayerDTO player;
     private GameDTO game;
     private MoveDTO move;
+    private WordGameDTO wordGame;
+    private ChoiceDTO choice;
     public Request(){
 
     }
@@ -34,6 +36,20 @@ public class Request {
     public void setMove(MoveDTO move) {
         this.move = move;
     }
+    public WordGameDTO getWordGame() {
+        return wordGame;
+    }
+    public void setWordGame(WordGameDTO wordGame) {
+        this.wordGame = wordGame;
+    }
+    public ChoiceDTO getChoice() {
+        return choice;
+    }
+    public void setChoice(ChoiceDTO choice) {
+        this.choice = choice;
+    }
+
+
     @Override
     public String toString() {
         return "Request{" +

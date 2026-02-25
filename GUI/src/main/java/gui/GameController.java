@@ -3,6 +3,7 @@ package gui;
 import Domain.Game;
 import Domain.Move;
 import Domain.Player;
+import Domain.WordGame;
 import Services.GameException;
 import Services.IObserver;
 import Services.IServices;
@@ -335,6 +336,11 @@ public class GameController implements IObserver {
             }
         });
 
+
+    }
+
+    @Override
+    public void wordGame(WordGame wordGame) throws GameException {
 
     }
 }

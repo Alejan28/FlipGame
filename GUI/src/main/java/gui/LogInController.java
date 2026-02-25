@@ -21,6 +21,7 @@ public class LogInController {
     private  TextField user;
     private IServices services;
     private GameController gameController;
+    private GridPaneController gridPaneController;
     private Parent parent;
 
     public void setServices(IServices services) {
@@ -32,6 +33,9 @@ public class LogInController {
     public void setGameController(GameController gameController) {
         this.gameController = gameController;
     }
+    public void setGridPaneController(GridPaneController gridPaneController) {
+        this.gridPaneController = gridPaneController;
+    }
     public void pressLogin(ActionEvent actionEvent) {
         if(!Objects.equals(user.getText(), "")){
             String nickname = user.getText();
@@ -40,7 +44,7 @@ public class LogInController {
             player.setPrenume("");
             player.setNume("");
             try{
-            services.login(player,gameController);
+            services.login(player,gridPaneController);
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Login");
             alert.setHeaderText(null);
@@ -56,8 +60,8 @@ public class LogInController {
                         System.exit(0);
                     }
                 });
-                gameController.setPlayer(player);
-                gameController.setServices(services);
+                gridPaneController.setPlayer(player);
+                gridPaneController.setService(services);
                 stage.show();
 
                 ((Node)(actionEvent.getSource())).getScene().getWindow().hide();
